@@ -25,20 +25,22 @@ class Game(gameClient: GameClient) extends BasicGame("Hello") with Loggable with
             tank = newTank
         }
         
-        var bulletsToRemove = List[Bullet]()
+        var bulletsToRemove = List[Int]()
         bullets.foreach(pair => {
-            val oldBullet = pair._2
-            val newBullet = oldBullet.move(delta)
+            val newBullet = pair._2.move(delta)
             
             if(world.collidesWith(newBullet)) {
-                bulletsToRemove = oldBullet :: bulletsToRemove
+                for(block <- world.getColliders(newBullet)) {
+                    world.updateBlock(block.damage(newBullet.step()))
+                }
+                bulletsToRemove = newBullet.playerId :: bulletsToRemove
             } else {
                 bullets(newBullet.playerId) = newBullet
             }
         })
         
-        for(bullet <- bulletsToRemove) {
-            bullets.remove(bullet.playerId)
+        for(playerId <- bulletsToRemove) {
+            bullets.remove(playerId)
         }
     }
 

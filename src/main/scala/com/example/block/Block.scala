@@ -2,7 +2,7 @@ package com.example.block
 
 import org.newdawn.slick.geom.{ShapeRenderer, Vector2f, Rectangle, Shape}
 import org.newdawn.slick.{Image, Color, Graphics}
-import com.example.{World, Direction, Entity}
+import com.example.{Bullet, World, Direction, Entity}
 
 abstract class Block(val blockType: Int, val pos: Vector2f) extends Entity {
     
@@ -17,7 +17,7 @@ abstract class Block(val blockType: Int, val pos: Vector2f) extends Entity {
         ShapeRenderer.textureFit(shape, texture, 2f, 2f)
     }
     
-    def damage(direction: Direction.Direction) { }
+    def damage(bullet: Bullet): Block = { this }
 }
 
 object Block {

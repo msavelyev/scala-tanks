@@ -10,9 +10,6 @@ class Tank(
     val moving: Boolean
 ) extends Entity {
     
-    val x = pos.x
-    val y = pos.y
-    
     val picture = Images.i.TANK.copy()
     
     def this(playerId: Int, pos: Vector2f) = this(playerId, pos, Direction.Up, false)

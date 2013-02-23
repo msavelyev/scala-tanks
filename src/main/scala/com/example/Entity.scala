@@ -6,6 +6,9 @@ import org.newdawn.slick.Graphics
 trait Entity {
     
     val shape: Shape
+    val pos: Vector2f
+    val x = pos.x
+    val y = pos.y
     
     def collidesWith(e: Entity): Boolean
     def draw(g: Graphics)

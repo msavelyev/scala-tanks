@@ -21,7 +21,7 @@ class World(val width: Float, val height: Float) extends Loggable {
         Array(0, 0, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1)
     )
     
-    val allwaysCollide = new Border(new Vector2f()) {
+    val alwaysCollide = new Border(new Vector2f()) {
         override def collidesWith(e: Entity): Boolean = true
     }
     
@@ -44,17 +44,23 @@ class World(val width: Float, val height: Float) extends Loggable {
         }
     }
     
+    def updateBlock(block: Block) {
+        val iX = math.floor(block.x / World.BLOCK_SIZE).toInt
+        val iY = math.floor(block.y / World.BLOCK_SIZE).toInt
+        realWorld(iX)(iY) = block
+    }
+    
     def collidesWith(e: Entity): Boolean = {
         getColliders(e).nonEmpty
     }
     
     def getColliders(e: Entity): List[Block] = {
         e.getCorners.map(v => {
-            val iX = math.floor(v.x / 32).toInt
-            val iY = math.floor(v.y / 32).toInt
+            val iX = math.floor(v.x / World.BLOCK_SIZE).toInt
+            val iY = math.floor(v.y / World.BLOCK_SIZE).toInt
 
             if(iX < 0 || iY < 0 || iX >= worldWidthInBlocks || iY >= worldHeightInBlocks) {
-                allwaysCollide
+                alwaysCollide
             } else {
                 realWorld(iX)(iY)
             }

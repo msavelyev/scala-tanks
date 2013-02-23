@@ -5,9 +5,6 @@ import org.newdawn.slick.Graphics
 
 class Bullet(val playerId: Int, val pos: Vector2f, val direction: Direction.Direction) extends Entity {
     
-    val x = pos.x
-    val y = pos.y
-    
     val picture = Images.i.BULLET.copy()
     picture.rotate(Helper.angleByDirection(direction) - picture.getRotation)
     
@@ -15,10 +12,6 @@ class Bullet(val playerId: Int, val pos: Vector2f, val direction: Direction.Dire
     
     def move(delta: Int) = Bullet.move(this, delta)
     
-    override def toString = {
-        pos.x.formatted("%.3f") + ";" + pos.y.formatted("%.3f") 
-    }
-
     def collidesWith(e: Entity): Boolean = {
         shape.intersects(e.shape)
     }
@@ -26,6 +19,8 @@ class Bullet(val playerId: Int, val pos: Vector2f, val direction: Direction.Dire
     def draw(g: Graphics) {
         picture.draw(pos.x, pos.y)
     }
+    
+    def step() = Bullet.step(this)
 }
 
 object Bullet {
@@ -33,6 +28,15 @@ object Bullet {
     
     def apply(playerId: Int, tank: Tank) =
         new Bullet(playerId, tank.pos, tank.direction)
+    
+    def step(bullet: Bullet) = {
+        val v = Helper.move(bullet.pos, SPEED, 40, bullet.direction)
+        new Bullet(
+            bullet.playerId,
+            new Vector2f(math.round(v.x), math.round(v.y)),
+            bullet.direction
+        )
+    }
     
     def move(bullet: Bullet, delta: Int) =
         new Bullet(
