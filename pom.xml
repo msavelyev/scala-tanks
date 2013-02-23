@@ -55,7 +55,7 @@
                     <jvmArgs>
                         <jvmArg>-Djava.library.path=target/natives</jvmArg>
                     </jvmArgs>
-                    <mainClass>Game</mainClass>
+                    <mainClass>com.example.Game</mainClass>
                 </configuration>
             </plugin>
             <plugin>

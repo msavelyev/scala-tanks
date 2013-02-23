@@ -1,6 +1,6 @@
 package com.example
 
-import block.Block
+import block.{Border, BrickWall, Empty, Block}
 import org.newdawn.slick.geom.{Polygon, Shape, ShapeRenderer, Vector2f}
 import org.newdawn.slick.{Color, Graphics}
 
@@ -21,10 +21,8 @@ class World(val width: Float, val height: Float) extends Loggable {
         Array(0, 0, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1)
     )
     
-    val allwaysCollide = new Entity {
-        def draw(g: Graphics) {}
-        def collidesWith(e: Entity): Boolean = true
-        val shape: Shape = new Polygon()
+    val allwaysCollide = new Border(new Vector2f()) {
+        override def collidesWith(e: Entity): Boolean = true
     }
     
     private val worldWidthInBlocks = math.ceil(width / World.BLOCK_SIZE).toInt
@@ -39,24 +37,15 @@ class World(val width: Float, val height: Float) extends Loggable {
 
             realWorld(x)(y) = 
                 if(x < initWorld.length && y < initWorld(x).length && initWorld(y)(x) == 1) {
-                    Block(Block.WALL, new Vector2f(rX, rY))
+                    new BrickWall(new Vector2f(rX, rY))
                 } else {
-                    Block(Block.EMPTY, new Vector2f(rX, rY))
+                    new Empty(new Vector2f(rX, rY))
                 }
         }
     }
     
     def collidesWith(e: Entity): Boolean = {
-        e.getCorners.map(v => {
-            val iX = math.floor(v.x / 32).toInt
-            val iY = math.floor(v.y / 32).toInt
-            
-            if(iX < 0 || iY < 0 || iX >= worldWidthInBlocks || iY >= worldHeightInBlocks) {
-                allwaysCollide
-            } else {
-                realWorld(iX)(iY)
-            }
-        }).filter(b => b.collidesWith(e)).nonEmpty
+        getColliders(e).nonEmpty
     }
     
     def getColliders(e: Entity): List[Block] = {
