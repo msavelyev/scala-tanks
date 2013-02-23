@@ -1,3 +1,4 @@
+import block.Block
 import org.newdawn.slick.geom.{Polygon, Shape, ShapeRenderer, Vector2f}
 import org.newdawn.slick.{Color, Graphics}
 
@@ -54,6 +55,19 @@ class World(val width: Float, val height: Float) extends Loggable {
                 realWorld(iX)(iY)
             }
         }).filter(b => b.collidesWith(e)).nonEmpty
+    }
+    
+    def getColliders(e: Entity): List[Block] = {
+        e.getCorners.map(v => {
+            val iX = math.floor(v.x / 32).toInt
+            val iY = math.floor(v.y / 32).toInt
+
+            if(iX < 0 || iY < 0 || iX >= worldWidthInBlocks || iY >= worldHeightInBlocks) {
+                allwaysCollide
+            } else {
+                realWorld(iX)(iY)
+            }
+        }).filter(b => b.collidesWith(e))
     }
     
     def draw(g: Graphics) {
