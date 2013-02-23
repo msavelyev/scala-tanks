@@ -14,7 +14,7 @@ class Game(gameClient: GameClient) extends BasicGame("Hello") with KeyListener {
     var tank: Image = _
 
     val scale = 1.0f
-    val step = 26f
+    val step = 32f
 
     var playerId = -1
 
@@ -57,10 +57,27 @@ class Game(gameClient: GameClient) extends BasicGame("Hello") with KeyListener {
         g.setColor(Color.black)
         g.fillRect(0, 0, container.getWidth, container.getHeight)
 
+        g.setColor(new Color(.9f, .9f, .9f, .2f))
+        for(x <- 0 to 100) {
+            g.drawLine(x * 8, 0, x * 8, 600)
+            if(x % 2 == 0) {
+                g.drawLine(x * 8, 0, x * 8, 600)
+            }
+        }
+        for(y <- 0 to 75) {
+            g.drawLine(0, y * 8, 800, y * 8)
+            if(y % 2 == 0) {
+                g.drawLine(0, y * 8, 800, y * 8)
+            }
+        }
+
         tank.draw(x, y, scale)
+        
+        g.setColor(Color.red)
+        g.drawRect(x, y, step, step)
 
         g.setColor(Color.white)
-        g.drawString("" + (x / step).toInt + ";" + (y / step).toInt, 10, 25)
+        g.drawString("" + x.formatted("%.3f") + ";" + y.formatted("%.3f"), 10, 25)
 
         for (player <- players.values) {
             tank.draw(player.x * step, player.y * step)
@@ -73,15 +90,19 @@ class Game(gameClient: GameClient) extends BasicGame("Hello") with KeyListener {
             case Input.KEY_UP => 
                 moveDirection = MoveDirection.Up
                 tank.rotate(0 - tank.getRotation)
+                x = 16 * scala.math.round(x / 16) 
             case Input.KEY_DOWN =>
                 moveDirection = MoveDirection.Down
                 tank.rotate(180 - tank.getRotation)
+                x = 16 * scala.math.round(x / 16)
             case Input.KEY_LEFT =>
                 moveDirection = MoveDirection.Left
                 tank.rotate(270 - tank.getRotation)
+                y = 16 * scala.math.round(y / 16)
             case Input.KEY_RIGHT =>
                 moveDirection = MoveDirection.Right
                 tank.rotate(90 - tank.getRotation)
+                y = 16 * scala.math.round(y / 16)
             case _ =>
         }
     }
