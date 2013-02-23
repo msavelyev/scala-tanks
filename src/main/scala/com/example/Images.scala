@@ -1,3 +1,5 @@
+package com.example
+
 import org.newdawn.slick.Image
 
 class Images {

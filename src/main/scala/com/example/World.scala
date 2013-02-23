@@ -1,3 +1,5 @@
+package com.example
+
 import block.Block
 import org.newdawn.slick.geom.{Polygon, Shape, ShapeRenderer, Vector2f}
 import org.newdawn.slick.{Color, Graphics}

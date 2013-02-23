@@ -1,3 +1,5 @@
+package com.example
+
 import org.newdawn.slick.geom.{Vector2f, Rectangle, Shape}
 import org.newdawn.slick.{Color, Graphics}
 

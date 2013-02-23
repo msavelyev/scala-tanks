@@ -1,3 +1,5 @@
+package com.example
+
 
 object Direction extends Enumeration {
     type Direction = Value
