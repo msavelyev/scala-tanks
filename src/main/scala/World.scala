@@ -44,21 +44,16 @@ class World(val width: Float, val height: Float) extends Loggable {
     }
     
     def collidesWith(e: Entity): Boolean = {
-//        INFO << "--------------------------------"
-        val result = e.getCorners.map(v => {
+        e.getCorners.map(v => {
             val iX = math.floor(v.x / 32).toInt
             val iY = math.floor(v.y / 32).toInt
             
-//            INFO << "checking block " + iX + ";" + iY
-            
-            if(iX < 0 || iY < 0 || iX > worldWidthInBlocks || iY > worldHeightInBlocks) {
+            if(iX < 0 || iY < 0 || iX >= worldWidthInBlocks || iY >= worldHeightInBlocks) {
                 allwaysCollide
             } else {
                 realWorld(iX)(iY)
             }
         }).filter(b => b.collidesWith(e)).nonEmpty
-//        INFO << "collides = " + result
-        result
     }
     
     def draw(g: Graphics) {

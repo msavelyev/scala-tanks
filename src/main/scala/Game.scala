@@ -17,7 +17,6 @@ class Game(gameClient: GameClient) extends BasicGame("Hello") with Loggable with
     val bullets = mutable.Map[Int, Bullet]()
     
     def update(container: GameContainer, delta: Int) {
-        INFO << "tank direction " + tank.direction
         val newTank = tank.move(delta)
         
         if(!world.collidesWith(newTank)) {
@@ -26,14 +25,13 @@ class Game(gameClient: GameClient) extends BasicGame("Hello") with Loggable with
         
         var bulletsToRemove = List[Bullet]()
         bullets.foreach(pair => {
-            val b = pair._2
-            val newB = b.move(delta)
-            if(newB.x < -World.BLOCK_SIZE || newB.x > container.getWidth) {
-                bulletsToRemove = b :: bulletsToRemove
-            } else if(newB.y < -World.BLOCK_SIZE || newB.y > container.getHeight) {
-                bulletsToRemove = b :: bulletsToRemove
+            val oldBullet = pair._2
+            val newBullet = oldBullet.move(delta)
+            
+            if(world.collidesWith(newBullet)) {
+                bulletsToRemove = oldBullet :: bulletsToRemove
             } else {
-                bullets(newB.playerId) = newB
+                bullets(newBullet.playerId) = newBullet
             }
         })
         
@@ -62,7 +60,6 @@ class Game(gameClient: GameClient) extends BasicGame("Hello") with Loggable with
     }
 
     def render(container: GameContainer, g: Graphics) {
-        INFO << "tank direction " + tank.direction
         drawBackground(g, container)
         
         world.draw(g)
