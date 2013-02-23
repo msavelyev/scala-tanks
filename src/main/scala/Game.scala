@@ -1,6 +1,6 @@
 import org.newdawn.slick._
 import geom.{ShapeRenderer, Rectangle, Shape}
-import scala.collection.mutable
+import collection.mutable
 
 class Game(gameClient: GameClient) extends BasicGame("Hello") with Loggable with KeyListener {
     
@@ -41,14 +41,78 @@ class Game(gameClient: GameClient) extends BasicGame("Hello") with Loggable with
     )
     
     var realWorld: Array[Array[Option[Shape]]] = _
+    
+    def isThereAWall(x: Int, y: Int) = {
+        def bla(x: Int, y: Int) = {
+            var result = true
+            /*if(x < -1 || y < -1) {
+                true
+            } else */if(y < 0 || x < 0) {
+                result = false 
+            } else if(y >= realWorld.length) {
+                result = false
+            } else if(x >= realWorld(y).length) {
+                result = false
+            } else {
+                result = realWorld(y)(x).nonEmpty
+            }
+            INFO << "at " + x + ";" + y + " = " + result
+            
+            result
+        }
+        
+        bla(x - 1, y - 1)
+    }
 
     def update(container: GameContainer, delta: Int) {
         if(moving) {
+            val iY = (y / 32).toInt
+            val iX = (x / 32).toInt
             moveDirection match {
-                case MoveDirection.Up => y -= speed * delta
-                case MoveDirection.Down => y += speed * delta
-                case MoveDirection.Left => x -= speed * delta
-                case MoveDirection.Right => x += speed * delta
+                case MoveDirection.Up =>
+                    var canMove = true
+                    if(x % 32 == 0) {
+                        canMove &= !isThereAWall(iX, iY)
+                    } else {
+                        canMove &= !isThereAWall(iX, iY)
+                        canMove &= !isThereAWall(iX + 1, iY)
+                    }
+                    if(canMove) { 
+                        y -= speed * delta
+                    }
+                case MoveDirection.Down =>
+                    var canMove = true
+                    if(x % 32 == 0) {
+                        canMove &= !isThereAWall(iX, iY + 1)
+                    } else {
+                        canMove &= !isThereAWall(iX, iY + 1)
+                        canMove &= !isThereAWall(iX + 1, iY + 1)
+                    }
+                    if(canMove) {
+                        y += speed * delta
+                    }
+                case MoveDirection.Left =>
+                    var canMove = true
+                    if(y % 32 == 0) {
+                        canMove &= !isThereAWall(iX, iY)
+                    } else {
+                        canMove &= !isThereAWall(iX, iY)
+                        canMove &= !isThereAWall(iX, iY + 1)
+                    }
+                    if(canMove) {
+                        x -= speed * delta
+                    }
+                case MoveDirection.Right =>
+                    var canMove = true
+                    if(y % 32 == 0) {
+                        canMove &= !isThereAWall(iX + 1, iY)
+                    } else {
+                        canMove &= !isThereAWall(iX + 1, iY)
+                        canMove &= !isThereAWall(iX + 1, iY + 1)
+                    }
+                    if(canMove) {
+                        x += speed * delta
+                    }
                 case _ =>
             }
         }
@@ -57,7 +121,6 @@ class Game(gameClient: GameClient) extends BasicGame("Hello") with Loggable with
         bullets.foreach(pair => {
             val b = pair._2
             b.move(bulletSpeed * delta)
-            INFO << "bullet " + b
             if(b.x < -blockSize || b.x > container.getWidth) {
                 bulletsToRemove = b :: bulletsToRemove
             } else if(b.y < -blockSize || b.y > container.getHeight) {
@@ -66,7 +129,6 @@ class Game(gameClient: GameClient) extends BasicGame("Hello") with Loggable with
         })
         
         for(bullet <- bulletsToRemove) {
-            INFO << "removed " + bullet.playerId
             bullets.remove(bullet.playerId)
         }
     }
@@ -91,14 +153,14 @@ class Game(gameClient: GameClient) extends BasicGame("Hello") with Loggable with
         container.getInput.addKeyListener(this)
         
         realWorld = Array.ofDim(10, 10)
-        for(y <- 0 until initWorld.length) {
-            for(x <- 0 until initWorld(y).length) {
-                val block = initWorld(y)(x)
+        for(x <- 0 until initWorld.length) {
+            for(y <- 0 until initWorld(x).length) {
+                val block = initWorld(x)(y)
                 
                 if(block == 1) {
-                    realWorld(y)(x) = Some(new Rectangle((y + 1) * blockSize, (x + 1) * blockSize, blockSize + 1, blockSize + 1))
+                    realWorld(x)(y) = Some(new Rectangle((y + 1) * blockSize, (x + 1) * blockSize, blockSize + 1, blockSize + 1))
                 } else {
-                    realWorld(y)(x) = None
+                    realWorld(x)(y) = None
                 }
             }
         }
@@ -155,9 +217,9 @@ class Game(gameClient: GameClient) extends BasicGame("Hello") with Loggable with
 
     def drawWalls(g: Graphics) {
         g.setColor(Color.white)
-        for (y <- 0 until realWorld.length) {
-            for (x <- 0 until realWorld(y).length) {
-                val shape = realWorld(y)(x)
+        for (x <- 0 until realWorld.length) {
+            for (y <- 0 until realWorld(x).length) {
+                val shape = realWorld(x)(y)
                 shape match {
                     case Some(s) =>
                         ShapeRenderer.textureFit(s, wall, 2f, 2f)
