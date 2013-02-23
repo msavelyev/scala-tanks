@@ -1,23 +1,41 @@
+import org.newdawn.slick.geom.{Vector2f, Rectangle}
+import org.newdawn.slick.Graphics
 
-class Bullet (val playerId: Int, var x: Float, var y: Float, val direction: MoveDirection.MoveDirection) {
+class Bullet(val playerId: Int, val pos: Vector2f, val direction: Direction.Direction) extends Entity {
     
-    def move(delta: Float) {
-        direction match {
-            case MoveDirection.Up => y -= delta
-            case MoveDirection.Down => y += delta
-            case MoveDirection.Left => x -= delta
-            case MoveDirection.Right => x += delta
-            case _ =>
-        }
-    }
+    val x = pos.x
+    val y = pos.y
+    
+    val picture = Images.i.BULLET.copy()
+    picture.rotate(Helper.angleByDirection(direction) - picture.getRotation)
+    
+    val shape = new Rectangle(pos.x + 13, pos.y + 12, 6, 8)
+    
+    def move(delta: Int) = Bullet.move(this, delta)
     
     override def toString = {
-        x.formatted("%.3f") + ";" + y.formatted("%.3f") 
+        pos.x.formatted("%.3f") + ";" + pos.y.formatted("%.3f") 
     }
-    
+
+    def collidesWith(e: Entity): Boolean = {
+        shape.intersects(e.shape)
+    }
+
+    def draw(g: Graphics) {
+        picture.draw(pos.x, pos.y)
+    }
 }
 
 object Bullet {
-    def apply(playerId: Int, x: Float, y: Float, direction: MoveDirection.MoveDirection) =
-        new Bullet(playerId, x, y, direction)
+    val SPEED = 0.2f
+    
+    def apply(playerId: Int, tank: Tank) =
+        new Bullet(playerId, tank.pos, tank.direction)
+    
+    def move(bullet: Bullet, delta: Int) =
+        new Bullet(
+            bullet.playerId,
+            Helper.move(bullet.pos, SPEED, delta, bullet.direction),
+            bullet.direction
+        )
 }
