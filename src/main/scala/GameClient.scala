@@ -6,7 +6,6 @@ import org.cometd.websocket.client.WebSocketTransport
 import org.eclipse.jetty.websocket.WebSocketClientFactory
 import scala.collection.mutable.Map
 import java.util.{Map => JavaMap}
-import java.lang.Integer
 import scala.collection.JavaConversions._
 
 class GameClient extends Loggable {
