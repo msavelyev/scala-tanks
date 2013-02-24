@@ -1,5 +1,6 @@
 package com.example
 
+import block.Block
 import org.newdawn.slick._
 import geom.{Vector2f, ShapeRenderer, Rectangle, Shape}
 import collection.mutable
@@ -30,7 +31,7 @@ class Game(gameClient: GameClient) extends BasicGame("Hello") with Loggable with
             val newBullet = pair._2.move(delta)
             
             if(world.collidesWith(newBullet)) {
-                for(block <- world.getColliders(newBullet)) {
+                for(block: Block <- world.getColliders(newBullet).toSet) {
                     world.updateBlock(block.damage(newBullet.step()))
                 }
                 bulletsToRemove = newBullet.playerId :: bulletsToRemove
