@@ -2,41 +2,55 @@ package com.example.block
 
 import scala.util.control.Breaks._
 import org.newdawn.slick.geom._
-import org.newdawn.slick.Graphics
+import org.newdawn.slick.{Color, Graphics}
 import com.example._
 import block.BrickWall.WallMask
 
-class BrickWall(pos: Vector2f, override val shape: Shape, val mask: WallMask) extends Block(Block.WALL, pos) with Loggable {
+class BrickWall(pos: Vector2f, val shapes: List[Shape], val mask: WallMask) extends Block(Block.WALL, pos) with Loggable {
+    
+    override val shape: Shape = null
+
+    def this(pos: Vector2f, mask: WallMask) =
+        this(
+            pos,
+            mask.createShapes(pos),
+            mask
+        )
     
     def this(pos: Vector2f) =
         this(
             pos,
-            new Rectangle(pos.x, pos.y, World.BLOCK_SIZE + 1, World.BLOCK_SIZE + 1),
             WallMask.FULL
         )
     
-    def this(pos: Vector2f, mask: WallMask) = {
-        this(pos, mask.createShape(pos), mask)
-    }
-    
     def draw(g: Graphics) {
-        defaultDraw(g, Images.i.WALL)
+        g.setColor(Color.white)
+        
+        for(shape <- shapes) {
+            ShapeRenderer.textureFit(shape, Images.i.WALL, .5f, .5f)
+        }
+    }
+
+
+    override def collidesWith(e: Entity): Boolean = {
+        val intersected: List[Shape] = shapes.filter(s => s.intersects(e.shape))
+        
+        INFO << "----------------------------------------"
+        for(shape <- intersected) {
+            INFO << "intersected with " + shape.getX + ";" + shape.getY
+        }
+        
+        intersected.nonEmpty
     }
 
     override def damage(bullet: Bullet): Block = {
         val newWallMask = mask.boom(bullet.direction)
-        new BrickWall(pos, newWallMask.createShape(pos), newWallMask)
+        new BrickWall(pos, newWallMask.createShapes(pos), newWallMask)
     }
     
 }
 
 object BrickWall {
-    def apply(pos: Vector2f, mask: WallMask, direction: Direction.Direction) = {
-        
-        
-        new BrickWall(pos)
-    }
-
     class WallMask(val mask: Array[Array[Int]]) extends Loggable {
         def boom(direction: Direction.Direction): WallMask = {
             direction match {
@@ -108,40 +122,23 @@ object BrickWall {
             
             val result = new WallMask(newMask)
             INFO << "withoutTopRow " + this + " into " + result
-            result
-        }
+            result        }
         
-        def createShape(pos: Vector2f) = {
+        def createShapes(pos: Vector2f) = {
             var shapes = List[Shape]()
             for(i <- 0 until mask.length) {
                 for(j <- 0 until mask.length) {
                     if(mask(i)(j) == 1) {
-                        val x = pos.x + j * 8
-                        val y = pos.y + i * 8
-                        INFO << "shape at " + x.formatted("%.3f") + ";" + y.formatted("%.3f")
-                        val shape = new Rectangle(x, y, 9f, 9f)
+                        val x = math.round(pos.x + j * 8).toFloat
+                        val y = math.round(pos.y + i * 8).toFloat
+                        INFO << "shape at " + x + ";" + y
+                        val shape = new Rectangle(x, y, 8f, 8f)
                         shapes = shape :: shapes
                     }
                 }
             }
             
-            if(shapes.nonEmpty) {
-                var result = shapes.head
-                val t = shapes.tail
-                for(shape <- t) {
-                    val union: Array[Shape] = result.union(shape)
-                    if(union.length > 0) {
-                        result = union(0)
-                    }
-                    if(union.length > 1) {
-                        INFO << "union.length = " + union.length
-                    }
-                }
-                
-                result
-            } else {
-                new Rectangle(-World.BLOCK_SIZE, -World.BLOCK_SIZE, 0, 0) 
-            }
+            shapes
         }
     }
     
