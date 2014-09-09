@@ -40,7 +40,7 @@
     </pluginRepositories>
 
     <properties>
-        <lwjgl.version>2.8.5</lwjgl.version>
+        <lwjgl.version>2.9.1</lwjgl.version>
         <java.library.path>${project.build.directory}/natives</java.library.path>
     </properties>
 
