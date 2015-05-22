@@ -25,11 +25,6 @@
             <url>http://java.freehep.org/maven2</url>
         </repository>
 
-        <repository>
-            <id>slick-repo</id>
-            <url>http://slick.cokeandcode.com/mavenrepo</url>
-        </repository>
-
     </repositories>
     <pluginRepositories>
         <pluginRepository>
@@ -127,6 +122,8 @@
             <groupId>slick</groupId>
             <artifactId>slick</artifactId>
             <version>274</version>
+            <scope>system</scope>
+            <systemPath>${basedir}/deps/slick-274.jar</systemPath>
         </dependency>
 
         <dependency>
